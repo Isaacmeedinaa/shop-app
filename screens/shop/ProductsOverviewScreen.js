@@ -1,10 +1,12 @@
 import React from "react";
-import { FlatList, StyleSheet } from "react-native";
+import { Platform, FlatList, StyleSheet } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
+import { Item, HeaderButtons } from "react-navigation-header-buttons";
 
 import * as cartActions from "../../store/actions/cart";
 
 import ProductItem from "../../components/shop/ProductItem";
+import CustomHeaderButton from "../../components/UI/CustomHeaderButton";
 
 const ProductsOverviewScreen = (props) => {
   const products = useSelector((state) => state.products.availableProducts);
@@ -35,6 +37,34 @@ const ProductsOverviewScreen = (props) => {
       )}
     />
   );
+};
+
+ProductsOverviewScreen.navigationOptions = (navData) => {
+  return {
+    headerTitle: "All Products",
+    headerLeft: () => (
+      <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
+        <Item
+          title="Menu"
+          iconName={Platform.OS === "android" ? "md-menu" : "ios-menu"}
+          onPress={() => {
+            navData.navigation.toggleDrawer();
+          }}
+        />
+      </HeaderButtons>
+    ),
+    headerRight: () => (
+      <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
+        <Item
+          title="Cart"
+          iconName={Platform.OS === "android" ? "md-cart" : "ios-cart"}
+          onPress={() => {
+            navData.navigation.navigate({ routeName: "Cart" });
+          }}
+        />
+      </HeaderButtons>
+    ),
+  };
 };
 
 const styles = StyleSheet.create({});
