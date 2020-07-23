@@ -1,5 +1,5 @@
 import React from "react";
-import { Platform, FlatList, StyleSheet } from "react-native";
+import { Platform, Button, FlatList, StyleSheet } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { Item, HeaderButtons } from "react-navigation-header-buttons";
 
@@ -8,9 +8,21 @@ import * as cartActions from "../../store/actions/cart";
 import ProductItem from "../../components/shop/ProductItem";
 import CustomHeaderButton from "../../components/UI/CustomHeaderButton";
 
+import colors from "../../constants/colors";
+
 const ProductsOverviewScreen = (props) => {
   const products = useSelector((state) => state.products.availableProducts);
   const dispatch = useDispatch();
+
+  const selectItemHandler = (id, title) => {
+    props.navigation.navigate({
+      routeName: "ProductDetails",
+      params: {
+        productId: id,
+        productTitle: title,
+      },
+    });
+  };
 
   return (
     <FlatList
@@ -21,19 +33,23 @@ const ProductsOverviewScreen = (props) => {
           image={itemData.item.imageUrl}
           title={itemData.item.title}
           price={itemData.item.price}
-          onViewDetails={() => {
-            props.navigation.navigate({
-              routeName: "ProductDetails",
-              params: {
-                productId: itemData.item.id,
-                productTitle: itemData.item.title,
-              },
-            });
+          onSelect={() => {
+            selectItemHandler(itemData.item.id, itemData.item.title);
           }}
-          onAddToCart={() => {
-            dispatch(cartActions.addToCart(itemData.item));
-          }}
-        />
+        >
+          <Button
+            color={colors.primary}
+            title="View Details"
+            onPress={() => {
+              selectItemHandler(itemData.item.id, itemData.item.title);
+            }}
+          />
+          <Button
+            color={colors.primary}
+            title="To Cart"
+            onPress={() => dispatch(cartActions.addToCart(itemData.item))}
+          />
+        </ProductItem>
       )}
     />
   );
