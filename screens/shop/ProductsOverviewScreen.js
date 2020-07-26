@@ -1,5 +1,13 @@
-import React, { useEffect } from "react";
-import { Platform, Button, FlatList, StyleSheet } from "react-native";
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  View,
+  Text,
+  Platform,
+  Button,
+  FlatList,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { Item, HeaderButtons } from "react-navigation-header-buttons";
 
@@ -12,12 +20,26 @@ import CustomHeaderButton from "../../components/UI/CustomHeaderButton";
 import colors from "../../constants/colors";
 
 const ProductsOverviewScreen = (props) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState();
+
   const products = useSelector((state) => state.products.availableProducts);
   const dispatch = useDispatch();
 
+  const loadingProducts = useCallback(async () => {
+    setError(null);
+    setIsLoading(true);
+    try {
+      await dispatch(productsActions.fetchProducts());
+    } catch (err) {
+      setError(err.message);
+    }
+    setIsLoading(false);
+  }, [dispatch, setIsLoading, setError]);
+
   useEffect(() => {
-    dispatch(productsActions.fetchProducts());
-  }, [dispatch]);
+    loadingProducts();
+  }, [dispatch, loadingProducts]);
 
   const selectItemHandler = (id, title) => {
     props.navigation.navigate({
@@ -28,6 +50,35 @@ const ProductsOverviewScreen = (props) => {
       },
     });
   };
+
+  if (error) {
+    return (
+      <View style={styles.centered}>
+        <Text>An error occured!</Text>
+        <Button
+          title="Try Again"
+          onPress={loadingProducts}
+          color={colors.primary}
+        />
+      </View>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
+
+  if (!isLoading && products.length === 0) {
+    return (
+      <View style={styles.centered}>
+        <Text>No Products Found!</Text>
+      </View>
+    );
+  }
 
   return (
     <FlatList
@@ -88,6 +139,12 @@ ProductsOverviewScreen.navigationOptions = (navData) => {
   };
 };
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+});
 
 export default ProductsOverviewScreen;
