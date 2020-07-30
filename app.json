@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "ShopApp",
+    "name": "Shop App",
     "slug": "ShopApp",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -21,6 +21,8 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "description": "",
+    "githubUrl": "https://github.com/Isaacmeedinaa/shop-app"
   }
 }
